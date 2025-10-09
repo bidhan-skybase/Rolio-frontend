@@ -2,6 +2,7 @@
 import { useState } from "react";
 import TextField from "@/components/textfield";
 import SocialButton from "@/components/socialMediaButton";
+import Image from "next/image";
 
 
 
@@ -106,14 +107,15 @@ export default function LoginPage() {
                     </div>
                 </div>
             </div>
-
-            {/* Right Section - Hidden on mobile */}
-            <div className="hidden lg:flex flex-1 bg-gradient-to-br from-amber-100 to-orange-100 items-center justify-center">
-                <div className="text-center p-8">
-                    <h2 className="text-4xl font-bold text-gray-800 mb-4">Welcome Back!</h2>
-                    <p className="text-gray-600">Sign in to continue your journey</p>
-                </div>
+            <div className="hidden lg:flex flex-1/6 bg-gradient-to-br from-amber-100 to-orange-100 items-center justify-center relative">
+                <Image
+                    src="/student.jpg"
+                    alt="User using the system"
+                    fill
+                    className="object-cover"
+                />
             </div>
+
         </div>
     );
 }
