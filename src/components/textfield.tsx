@@ -30,7 +30,7 @@ export default function TextField({
                 value={value}
                 onChange={onChange}
                 disabled={disabled}
-                className={`rounded-[8px] px-3 py-3 text-gray-900 placeholder-gray-500 
+                className={`rounded-[4px] px-3 py-3 text-gray-900 placeholder-gray-500 
         focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 placeholder:text-[14px]
         text-[16px] font-medium
         ${disabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
