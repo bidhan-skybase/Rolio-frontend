@@ -3,6 +3,8 @@ import {useState} from "react";
 import TextField from "@/components/textfield";
 import SocialButton from "@/components/socialMediaButton";
 import Image from "next/image";
+import {useRouter} from 'next/navigation';
+
 
 type Step = 'email' | 'otp';
 
@@ -97,11 +99,16 @@ const OTPStep: React.FC<OTPStepProps> = ({email, otp, setOtp, onVerify, onBack, 
             Check your email
         </h1> <h4 className="text-[14px] font-regular text-center m-4">
         We’ve sent you a passcode.
-        <br />
+        <br/>
         Please check your inbox at {email}.
     </h4>
         <div className="space-y-4">
-            <TextField placeholder={"Six digit code"}></TextField>
+            {/*type="email"*/}
+            {/*name="email"*/}
+            {/*value={email}*/}
+            {/*onChange={(e) => setEmail(e.target.value)*/}
+            <TextField placeholder={"Six digit code"} name={"OTP"} type={"number"} value={otp}
+                       onChange={(e) => setOtp(e.target.value)}></TextField>
 
             <button
                 onClick={onVerify}
@@ -112,7 +119,7 @@ const OTPStep: React.FC<OTPStepProps> = ({email, otp, setOtp, onVerify, onBack, 
             </button>
         </div>
         <div className="flex justify-center">
-            <button className="btn btn-link text-gray-600" style={{fontSize:12,}}>Resend Code</button>
+            <button className="btn btn-link text-gray-600" style={{fontSize: 12,}}>Resend Code</button>
         </div>
 
     </div>
@@ -124,6 +131,7 @@ export default function LoginPage() {
     const [step, setStep] = useState<Step>('email');
     const [otp, setOtp] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
 
     const handleContinue = () => {
         if (!email) return;
@@ -132,9 +140,9 @@ export default function LoginPage() {
         console.log("Email submitted:", email);
     };
 
-    function getSecureMail(){
+    function getSecureMail() {
 
-        const firstTwo = email.substring(0,2);
+        const firstTwo = email.substring(0, 2);
         const domain = email.substring(email.indexOf("@"));
         const sanitizedEmail = firstTwo + "*****" + domain;
         return sanitizedEmail
@@ -171,6 +179,7 @@ export default function LoginPage() {
         setTimeout(() => {
             setIsLoading(false);
             console.log("OTP verified!");
+            router.push("/pages/dashboard");
             // Redirect to dashboard or next step
         }, 1000);
     };
