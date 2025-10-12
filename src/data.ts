@@ -1,4 +1,6 @@
-export const jobTasks = [
+import {JobInterface} from "@/types/jobs";
+
+export const jobs:JobInterface[] = [
     // Saved Jobs
     {
         id: '1',
@@ -104,7 +106,6 @@ export const jobTasks = [
         salary: '$2000-$3000',
         description: 'This section will show notes reference o...',
         tags: ['REMOTE', 'FULL TIME'],
-        showInterview: true,
         status: 'interviews'
     },
     {
@@ -116,7 +117,6 @@ export const jobTasks = [
         salary: '$2000-$3000',
         description: 'This section will show notes reference o...',
         tags: ['REMOTE', 'FULL TIME'],
-        showInterview: true,
         status: 'interviews'
     },
     {
@@ -128,7 +128,6 @@ export const jobTasks = [
         salary: '$2000-$3000',
         description: 'This section will show notes reference o...',
         tags: ['REMOTE', 'FULL TIME'],
-        showInterview: true,
         status: 'interviews'
     },
     {
@@ -140,7 +139,6 @@ export const jobTasks = [
         salary: '$2000-$3000',
         description: 'This section will show notes reference o...',
         tags: ['REMOTE', 'FULL TIME'],
-        showInterview: true,
         status: 'interviews'
     },
     {
@@ -152,7 +150,6 @@ export const jobTasks = [
         salary: '$2000-$3000',
         description: 'This section will show notes reference o...',
         tags: ['REMOTE', 'FULL TIME'],
-        showInterview: true,
         status: 'interviews'
     },
     {
@@ -164,7 +161,6 @@ export const jobTasks = [
         salary: '$2000-$3000',
         description: 'This section will show notes reference o...',
         tags: ['REMOTE', 'FULL TIME'],
-        showInterview: true,
         status: 'interviews'
     },
     {
@@ -176,7 +172,6 @@ export const jobTasks = [
         salary: '$2000-$3000',
         description: 'This section will show notes reference o...',
         tags: ['REMOTE', 'FULL TIME'],
-        showInterview: true,
         status: 'interviews'
     },
     {
@@ -188,7 +183,6 @@ export const jobTasks = [
         salary: '$2000-$3000',
         description: 'This section will show notes reference o...',
         tags: ['REMOTE', 'FULL TIME'],
-        showInterview: true,
         status: 'interviews'
     },
 
@@ -273,3 +267,4 @@ export const jobTasks = [
         status: 'offered'
     },
 ];
+

@@ -2,9 +2,11 @@
 import {SortableContext, useSortable, verticalListSortingStrategy} from "@dnd-kit/sortable";
 import { CSS } from '@dnd-kit/utilities';
 import {useDroppable} from "@dnd-kit/core";
-import { X, MoreHorizontal, Bookmark } from 'lucide-react';
+import { X } from 'lucide-react';
+import {JobInterface} from "@/types/jobs";
+import {ColumnInterface} from "@/types/columnInterface";
 
-export function Task({ id, title, company, location, logo, bgColor, salary, description, tags, showInterview }) {
+export function Task({ id, title, company, logo, bgColor, salary, description, tags }:JobInterface) {
     const {
         attributes,
         listeners,
@@ -81,34 +83,11 @@ export function Task({ id, title, company, location, logo, bgColor, salary, desc
                     ))}
                 </div>
             )}
-
-            {/* Interview Time */}
-            {showInterview && (
-                <div className="flex items-center gap-1 text-xs text-gray-600 mt-2 pt-2 border-t border-gray-100">
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span>Today</span>
-                    <span className="font-semibold">9:30 AM</span>
-                    <button className="ml-auto text-gray-400 hover:text-gray-600">
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                        </svg>
-                    </button>
-                </div>
-            )}
-
-            {/* Applied Date (for Applied Jobs) */}
-            {!showInterview && tags && (
-                <div className="flex items-center text-xs text-gray-500 mt-2 pt-2 border-t border-gray-100">
-                    <span>Applied today</span>
-                </div>
-            )}
         </div>
     );
 }
 
-export function Column({ id, title, tasks, icon: Icon }) {
+export function Column({ id, title, tasks, icon: Icon }:ColumnInterface) {
     const { setNodeRef, isOver } = useDroppable({
         id: id,
     });
@@ -117,7 +96,6 @@ export function Column({ id, title, tasks, icon: Icon }) {
 
     return (
         <div className="rounded-[4px] p-3 flex-1 min-w-0 border border-gray-200" style={{backgroundColor:"#F2F2F2"}}>
-            {/* Column Header */}
             <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                     {Icon && <Icon size={16} className="text-gray-600" />}
@@ -128,7 +106,6 @@ export function Column({ id, title, tasks, icon: Icon }) {
 
             </div>
 
-            {/* Droppable Area */}
             <div
                 ref={setNodeRef}
                 className={`min-h-[400px] rounded-[4px] transition-colors ${
@@ -139,17 +116,16 @@ export function Column({ id, title, tasks, icon: Icon }) {
                     <div className='mt-6'>
                         {tasks.map((task) => (
                             <Task
+                                status={task.status}
                                 key={task.id}
                                 id={task.id}
                                 title={task.title}
                                 company={task.company}
-                                location={task.location}
                                 logo={task.logo}
                                 bgColor={task.bgColor}
                                 salary={task.salary}
                                 description={task.description}
                                 tags={task.tags}
-                                showInterview={task.showInterview}
                             />
                         ))}
                         {tasks.length === 0 && (
