@@ -1,9 +1,14 @@
 export default function JobBoard() {
     return (
         <>
-            <div className='pt-4 px-4'>
-                <p className='text-3xl font-semibold'>Job Board</p>
-                <p className='text-[16px] font-medium text-gray-500'>Browse and apply to jobs</p>
+            <div className='pt-4 px-4 pb-4 flex flex-row justify-between'>
+                <div>
+                    <p className='text-2xl font-semibold'>Job Board</p>
+                    <p className='text-[16px] font-medium text-gray-500'>Browse and apply to jobs</p>
+                </div>
+
+                <button className="btn shadow-none rounded-[4px]">Add Job</button>
+
             </div>
             <main className="flex-1 p-4 overflow-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-full">

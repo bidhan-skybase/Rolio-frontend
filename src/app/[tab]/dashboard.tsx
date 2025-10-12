@@ -2,8 +2,8 @@ export default function Dashboard() {
 
     return (
         <>
-            <div className='pt-4 px-4'>
-                <p className='text-3xl font-semibold'>Dashboard</p>
+            <div className='pt-4 px-4 pb-4'>
+                <p className='text-2xl font-semibold'>Dashboard</p>
                 <p className='text-[16px] font-medium text-gray-500'>Overview for all your jobs</p>
             </div>
             <main className="flex-1 p-4 overflow-auto">
