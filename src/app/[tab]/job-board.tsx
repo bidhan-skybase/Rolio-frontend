@@ -10,18 +10,12 @@ import {
 } from "@dnd-kit/core";
 import {arrayMove, sortableKeyboardCoordinates} from "@dnd-kit/sortable";
 import {Column} from "@/components/taskColumn";
+import {Bookmark, CheckCircle, Calendar, XCircle, Gift} from 'lucide-react';
+import {jobTasks} from "@/data";
+
 
 export default function JobBoard() {
-
-    const [tasks, setTasks] = useState([
-        { id: '1', title: 'Design landing page', status: 'todo' },
-        { id: '2', title: 'Setup authentication', status: 'todo' },
-        { id: '3', title: 'Build API endpoints', status: 'in-progress' },
-        { id: '4', title: 'Write documentation', status: 'in-progress' },
-        { id: '5', title: 'Deploy to production', status: 'done' },
-        { id: '6', title: 'Fix mobile responsiveness', status: 'done' },
-    ]);
-
+    const [tasks, setTasks] = useState(jobTasks);
     const [activeId, setActiveId] = useState(null);
 
     const sensors = useSensors(
@@ -31,10 +25,13 @@ export default function JobBoard() {
         })
     );
 
+
     const columns = {
-        todo: { id: 'todo', title: 'To Do' },
-        'in-progress': { id: 'in-progress', title: 'In Progress' },
-        done: { id: 'done', title: 'Done' },
+        saved: {id: 'saved', title: 'Saved Jobs', icon: Bookmark},
+        applied: {id: 'applied', title: 'Applied Jobs', icon: CheckCircle},
+        interviews: {id: 'interviews', title: 'Interviews', icon: Calendar},
+        rejected: {id: 'rejected', title: 'Rejected Jobs', icon: XCircle},
+        offered: {id: 'offered', title: 'Offered Jobs', icon: Gift},
     };
 
     const getTasksByStatus = (status) => {
@@ -46,7 +43,7 @@ export default function JobBoard() {
     };
 
     const handleDragOver = (event) => {
-        const { active, over } = event;
+        const {active, over} = event;
 
         if (!over) return;
 
@@ -68,7 +65,7 @@ export default function JobBoard() {
             setTasks((tasks) => {
                 return tasks.map((task) => {
                     if (task.id === activeId) {
-                        return { ...task, status: overColumn };
+                        return {...task, status: overColumn};
                     }
                     return task;
                 });
@@ -83,7 +80,7 @@ export default function JobBoard() {
                 setTasks((tasks) => {
                     return tasks.map((task) => {
                         if (task.id === activeId) {
-                            return { ...task, status: overTask.status };
+                            return {...task, status: overTask.status};
                         }
                         return task;
                     });
@@ -122,27 +119,27 @@ export default function JobBoard() {
                     onDragOver={handleDragOver}
                     onDragEnd={handleDragEnd}
                 >
-                    <div className="flex gap-6 overflow-x-auto pb-4">
+                    <div className="flex gap-3 overflow-x-auto pb-4">
                         {Object.values(columns).map((column) => (
                             <Column
                                 key={column.id}
                                 id={column.id}
                                 title={column.title}
+                                icon={column.icon}
                                 tasks={getTasksByStatus(column.id)}
                             />
                         ))}
                     </div>
-
-                    <DragOverlay>
-                        {activeTask ? (
-                            <div className="bg-white p-4 rounded-lg shadow-lg border-2 border-blue-400 cursor-grabbing">
-                                <h3 className="font-medium text-gray-900">{activeTask.title}</h3>
-                                <span className="text-xs text-gray-500 mt-2 inline-block">
-                  {activeTask.status}
-                </span>
-                            </div>
-                        ) : null}
-                    </DragOverlay>
+                    {/*    <DragOverlay>*/}
+                    {/*        {activeTask ? (*/}
+                    {/*            <div className="bg-white p-4 rounded-lg shadow-lg border-2 border-blue-400 cursor-grabbing">*/}
+                    {/*                <h3 className="font-medium text-gray-900">{activeTask.title}</h3>*/}
+                    {/*                <span className="text-xs text-gray-500 mt-2 inline-block">*/}
+                    {/*  {activeTask.status}*/}
+                    {/*</span>*/}
+                    {/*            </div>*/}
+                    {/*        ) : null}*/}
+                    {/*    </DragOverlay>*/}
                 </DndContext>
             </main>
         </>
