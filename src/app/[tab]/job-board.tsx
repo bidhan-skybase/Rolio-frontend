@@ -13,6 +13,18 @@ import {Column} from "@/components/taskColumn";
 import {Bookmark, CheckCircle, Calendar, XCircle, Gift} from 'lucide-react';
 import {JobInterface} from "@/types/jobs";
 import {jobs} from "@/data";
+import {Button} from "@/components/ui/button";
+import {
+    Dialog, DialogClose,
+    DialogContent,
+    DialogDescription, DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import {Label} from "@/components/ui/label";
+import {Input} from "@/components/ui/input";
+import {Textarea} from "@/components/ui/textarea";
 
 
 export default function JobBoard() {
@@ -35,7 +47,7 @@ export default function JobBoard() {
         offered: {id: 'offered', title: 'Offered Jobs', icon: Gift},
     };
 
-    const getTasksByStatus = (status:string) => {
+    const getTasksByStatus = (status: string) => {
         return tasks.filter((task) => task.status === status);
     };
 
@@ -101,7 +113,55 @@ export default function JobBoard() {
                     <p className='text-[16px] font-medium text-gray-500'>Browse and apply to jobs</p>
                 </div>
 
-                <button className="btn shadow-none rounded-[4px]">Add Job</button>
+
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button className="rounded-[4px] bg-black text-white text-[14px] hover:bg-black/80">
+                            Add Task
+                        </Button>
+                    </DialogTrigger> <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Add a new job</DialogTitle>
+                        <DialogDescription>
+                            Be as specific as possible. Add job title, company info, and other details below.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div>
+                        <Label className='mb-2 text-xs font-medium text-muted-foreground'>Job title *</Label>
+                        <Input placeholder='Title'></Input>
+                    </div>
+                    <div className='flex-row flex gap-2'>
+                        <div className='flex-2'>
+                            <Label className='mb-2 text-xs font-medium text-muted-foreground'>Company name *</Label>
+                            <Input placeholder='Name'></Input>
+                        </div>
+                        <div className='flex-2'>
+                            <Label className='mb-2 text-xs font-medium text-muted-foreground'>Logo Url</Label>
+                            <Input placeholder='Url'></Input>
+                        </div>
+                    </div>
+                    <div className='flex-row flex gap-2'>
+                        <div className='flex-2'>
+                            <Label className='mb-2 text-xs font-medium text-muted-foreground'>Expected salary</Label>
+                            <Input placeholder='Salary'></Input>
+                        </div>
+                        <div className='flex-2'>
+                            <Label className='mb-2 text-xs font-medium text-muted-foreground'>Tags</Label>
+                            <Input placeholder='Tags'></Input>
+                        </div>
+                    </div>
+                    <div>
+                        <Label className='mb-2 text-xs font-medium text-muted-foreground'>Description</Label>
+                        <Textarea placeholder="Type your description here." />
+                    </div>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button variant="outline">Cancel</Button>
+                        </DialogClose>
+                        <Button type="submit">Add Job</Button>
+                    </DialogFooter>
+                </DialogContent>
+                </Dialog>
 
             </div>
             <main className="flex-1 p-4 overflow-auto">
