@@ -4,6 +4,7 @@ import TextField from "@/components/textfield";
 import SocialButton from "@/components/socialMediaButton";
 import Image from "next/image";
 import {useRouter} from 'next/navigation';
+import axios from "axios";
 
 
 type Step = 'email' | 'otp';
@@ -31,6 +32,7 @@ interface EmailStepProps {
     onContinue: () => void;
     isLoading: boolean;
 }
+
 
 const EmailStep: React.FC<EmailStepProps> = ({email, setEmail, onContinue, isLoading}) => (
     <div className="w-full max-w-md space-y-6 animate-fadeIn">
@@ -133,13 +135,37 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
-    const handleContinue = () => {
-        if (!email) return;
+    async function handleEmailContinue() {
         setIsLoading(true);
-        // Add your login logic here
-        console.log("Email submitted:", email);
-    };
+        try {
+            const res = await axios.post('/api/auth/otp', { email });
+            console.log('OTP sent:', res.data);
+            setStep('otp');
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
+    async function handleVerify() {
+        if (otp.length !== 6) return;
+        setIsLoading(true);
+        try {
+            const res = await axios.post('/api/auth/verify', {
+                email: email,
+                otp: otp
+            });
+            console.log("verify otp:", res.data);
+            localStorage.setItem('access_token', res.data.access_token);
+            localStorage.setItem('user', JSON.stringify(res.data.user));
+            router.push("/dashboard");
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
     function getSecureMail() {
 
         const firstTwo = email.substring(0, 2);
@@ -160,29 +186,7 @@ export default function LoginPage() {
         setStep('email');
         setOtp("");
     };
-    const handleEmailContinue = () => {
-        if (!email) return;
-        setIsLoading(true);
 
-        // Simulate API call
-        setTimeout(() => {
-            setIsLoading(false);
-            setStep('otp');
-        }, 1000);
-    };
-
-    const handleOTPVerify = () => {
-        if (otp.length !== 6) return;
-        setIsLoading(true);
-
-        // Simulate API call
-        setTimeout(() => {
-            setIsLoading(false);
-            console.log("OTP verified!");
-            router.push("/pages/dashboard");
-            // Redirect to dashboard or next step
-        }, 1000);
-    };
 
     return (
         <div className="flex min-h-screen">
@@ -207,7 +211,7 @@ export default function LoginPage() {
                             email={getSecureMail()}
                             otp={otp}
                             setOtp={setOtp}
-                            onVerify={handleOTPVerify}
+                            onVerify={handleVerify}
                             onBack={handleBack}
                             isLoading={isLoading}
                         />
