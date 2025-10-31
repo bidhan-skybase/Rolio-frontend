@@ -1,6 +1,16 @@
 import React from 'react';
 import { MoveUpRight } from 'lucide-react';
 
+interface OTPStepProps {
+    email: string;
+    otp: string;
+    setOtp: (otp: string) => void;
+    onVerify: () => void;
+    onBack: () => void;
+    isLoading: boolean;
+}
+
+
 export default function Dashboard() {
     return (
 

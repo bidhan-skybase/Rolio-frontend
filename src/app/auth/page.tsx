@@ -157,8 +157,7 @@ export default function LoginPage() {
                 otp: otp
             });
             console.log("verify otp:", res.data);
-            localStorage.setItem('access_token', res.data.access_token);
-            localStorage.setItem('user', JSON.stringify(res.data.user));
+            document.cookie = `access_token=${res.data.access_token}; path=/; secure; samesite=strict`;
             router.push("/dashboard");
         } catch (error) {
             console.error(error);

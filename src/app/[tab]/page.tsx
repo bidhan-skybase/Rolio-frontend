@@ -3,10 +3,11 @@
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useEffect } from "react";
+import {useEffect, useState} from "react";
 import Dashboard from "@/app/[tab]/dashboard";
 import JobBoard from "@/app/[tab]/job-board";
 import Resumes from "@/app/[tab]/resumes";
+import axios from "axios";
 
 const tabs = ['dashboard', 'job-board', 'resumes'];
 
@@ -14,12 +15,35 @@ export default function DashboardPage() {
     const params = useParams();
     const router = useRouter();
     const currentTab = params.tab as string;
+    const [dashboardData, setDashboardData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
 
     useEffect(() => {
         if (!currentTab || !tabs.includes(currentTab)) {
             router.replace('/dashboard');
         }
     }, [currentTab, router]);
+
+    useEffect(() => {
+        const fetchDashboard = async () => {
+            try {
+                setLoading(true);
+                const res = await axios.get('/api/dashboard');
+                console.log("Dashboard data:", res.data);
+                setDashboardData(res.data);
+                setError(null);
+            } catch (err:any) {
+                console.error("Error fetching dashboard:", err);
+                setError(err.message || 'Failed to fetch dashboard data');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDashboard();
+    }, []);
 
     const getTabLabel = (slug: string) => {
         const labels = {
