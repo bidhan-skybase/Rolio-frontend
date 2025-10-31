@@ -25,11 +25,15 @@ import {
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
+import { X } from "lucide-react"
 
 
 export default function JobBoard() {
     const [tasks, setTasks] = useState<JobInterface[]>(jobs);
     const [activeId, setActiveId] = useState(null);
+    const [tags, setTags] = useState<string[]>([])
+    const [inputValue, setInputValue] = useState("")
+
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -105,6 +109,23 @@ export default function JobBoard() {
         setActiveId(null);
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (( e.key === "Enter") && inputValue.trim() !== "") {
+            e.preventDefault()
+            if (!tags.includes(inputValue.trim())) {
+                setTags([...tags, inputValue.trim()])
+            }
+            setInputValue("")
+        } else if (e.key === "Backspace" && inputValue === "" && tags.length > 0) {
+            setTags(tags.slice(0, -1))
+        }
+    }
+
+    const removeTag = (tagToRemove: string) => {
+        setTags(tags.filter(tag => tag !== tagToRemove))
+    }
+
+
     return (
         <>
             <div className='pt-4 px-4 pb-4 flex flex-row justify-between'>
@@ -117,7 +138,7 @@ export default function JobBoard() {
                 <Dialog>
                     <DialogTrigger asChild>
                         <Button className="rounded-[4px] bg-black text-white text-[14px] hover:bg-black/80">
-                            Add Task
+                            Add Job
                         </Button>
                     </DialogTrigger> <DialogContent>
                     <DialogHeader>
@@ -145,9 +166,36 @@ export default function JobBoard() {
                             <Label className='mb-2 text-xs font-medium text-muted-foreground'>Expected salary</Label>
                             <Input placeholder='Salary'></Input>
                         </div>
-                        <div className='flex-2'>
-                            <Label className='mb-2 text-xs font-medium text-muted-foreground'>Tags</Label>
-                            <Input placeholder='Tags'></Input>
+                        <div className="flex flex-col flex-2">
+                            <Label className="mb-2 text-xs font-medium text-muted-foreground">
+                                Tags
+                            </Label>
+
+                            <div className="flex flex-wrap items-center gap-2 rounded-[4px] border border-input bg-background px-2 py-0">
+                                {tags.map(tag => (
+                                    <div
+                                        key={tag}
+                                        className="flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+                                    >
+                                        <span>{tag}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeTag(tag)}
+                                            className="hover:text-foreground"
+                                        >
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    </div>
+                                ))}
+
+                                <Input
+                                    className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none flex-1 min-w-[80px]"
+                                    placeholder="Tags"
+                                    value={inputValue}
+                                    onChange={e => setInputValue(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                />
+                            </div>
                         </div>
                     </div>
                     <div>
