@@ -5,8 +5,9 @@ import {useDroppable} from "@dnd-kit/core";
 import { X } from 'lucide-react';
 import {JobInterface} from "@/types/jobs";
 import {ColumnInterface} from "@/types/columnInterface";
+import axios from "axios";
 
-export function Task({ id, title, company, logo, bgColor, salary, description, tags }:JobInterface) {
+export function Task({ id, title, company, logo, bgColor, salary, description, tags }: JobInterface) {
     const {
         attributes,
         listeners,
@@ -22,29 +23,45 @@ export function Task({ id, title, company, logo, bgColor, salary, description, t
         opacity: isDragging ? 0.5 : 1,
     };
 
+    async function deleteJob(jobId: string) {
+        console.log(jobId);
+        try {
+            await axios.delete('/api/jobs/delete', {
+                data: { id: jobId }
+            });
+            // TODO: Update UI after deletion
+        } catch (err: any) {
+            console.error('Failed to delete job:', err);
+        }
+    }
+
     return (
         <div
             ref={setNodeRef}
             style={style}
-            {...attributes}
-            {...listeners}
-            className="bg-white p-3 rounded-[4px] mb-2 cursor-grab active:cursor-grabbing hover:shadow-sm transition-shadow border border-gray-100"
+            className="bg-white p-3 rounded-[4px] mb-2 hover:shadow-sm transition-shadow border border-gray-100"
         >
             <div className="flex items-start gap-2 mb-2">
-                {/* Company Logo */}
+                {/* Drag Handle - Only this area triggers dragging */}
                 <div
-                    className="w-10 h-10 rounded-[4px] flex items-center justify-center flex-shrink-0 bg-gray-200 overflow-hidden"
-                    style={{ backgroundColor: 'red' }}
+                    {...attributes}
+                    {...listeners}
+                    className="cursor-grab active:cursor-grabbing"
                 >
-                    {logo ? (
-                        <img
-                            src={logo}
-                            alt="logo"
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <span className="text-white font-semibold text-sm">N/A</span>
-                    )}
+                    <div
+                        className="w-10 h-10 rounded-[4px] flex items-center justify-center flex-shrink-0 bg-gray-200 overflow-hidden"
+                        style={{ backgroundColor: 'red' }}
+                    >
+                        {logo ? (
+                            <img
+                                src={logo}
+                                alt="logo"
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <span className="text-white font-semibold text-sm">N/A</span>
+                        )}
+                    </div>
                 </div>
 
                 {/* Company Name & Menu */}
@@ -55,6 +72,9 @@ export function Task({ id, title, company, logo, bgColor, salary, description, t
                             className="text-gray-400 hover:text-gray-600 transition-colors"
                             onClick={(e) => {
                                 e.stopPropagation();
+                                if (confirm('Are you sure you want to delete this job?')) {
+                                    deleteJob(id);
+                                }
                             }}
                         >
                             <X size={14} />
@@ -63,22 +83,19 @@ export function Task({ id, title, company, logo, bgColor, salary, description, t
                 </div>
             </div>
 
-            {/* Job Title */}
-            <h3 className="font-bold text-gray-900 text-sm mb-1 ">
+            {/* Rest of the content remains the same */}
+            <h3 className="font-bold text-gray-900 text-sm mb-1">
                 {title}
             </h3>
 
-            {/* Salary */}
             {salary && (
                 <p className="text-xs text-gray-600 mb-2">{salary}</p>
             )}
 
-            {/* Description */}
             {description && (
                 <p className="text-xs text-gray-500 mb-2 line-clamp-2">{description}</p>
             )}
 
-            {/* Tags */}
             {tags && tags.length > 0 && (
                 <div className="flex gap-1 mb-2 flex-wrap">
                     {tags.map((tag, index) => (
@@ -94,7 +111,6 @@ export function Task({ id, title, company, logo, bgColor, salary, description, t
         </div>
     );
 }
-
 export function Column({ id, title, tasks, icon: Icon }:ColumnInterface) {
     const { setNodeRef, isOver } = useDroppable({
         id: id,
