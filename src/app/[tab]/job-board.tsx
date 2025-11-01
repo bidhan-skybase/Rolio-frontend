@@ -87,13 +87,12 @@ export default function JobBoard() {
         }
     }
 
-
     const columns = {
-        saved: {id: 'saved', title: 'Saved Jobs', icon: Bookmark},
-        applied: {id: 'applied', title: 'Applied Jobs', icon: CheckCircle},
-        interviews: {id: 'interviews', title: 'Interviews', icon: Calendar},
-        rejected: {id: 'rejected', title: 'Rejected Jobs', icon: XCircle},
-        offered: {id: 'offered', title: 'Offered Jobs', icon: Gift},
+        saved: { id: 'saved', title: 'Saved Jobs', icon: Bookmark },
+        applied: { id: 'applied', title: 'Applied Jobs', icon: CheckCircle },
+        interview: { id: 'interview', title: 'Interviews', icon: Calendar },
+        rejected: { id: 'rejected', title: 'Rejected Jobs', icon: XCircle },
+        offered: { id: 'offered', title: 'Offered Jobs', icon: Gift },
     };
 
     const getTasksByStatus = (status: string) => {
@@ -150,9 +149,32 @@ export default function JobBoard() {
         }
     };
 
-    const handleDragEnd = () => {
-        setActiveId(null);
+    const handleDragEnd = async (event) => {
+        const { active, over } = event;
+        if (!over) return;
+
+        const taskId = active.id.replace("task-", "");
+        const newStatus = over.id.replace("column-", "");
+
+        const oldTask = jobs.find((task) => task.id === Number(taskId));
+        if (!oldTask || oldTask.status === newStatus) return;
+
+        try {
+            setJobs((prev) =>
+                prev.map((task) =>
+                    task.id === Number(taskId) ? { ...task, status: newStatus } : task
+                )
+            );
+
+            await axios.patch("/api/jobs/update", {
+                job_id: Number(taskId),
+                status_value: newStatus,
+            });
+        } catch (error) {
+            console.error("Status update failed:", error);
+        }
     };
+
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (( e.key === "Enter") && inputValue.trim() !== "") {

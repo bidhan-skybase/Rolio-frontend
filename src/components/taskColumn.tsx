@@ -15,7 +15,7 @@ export function Task({ id, title, company, logo, bgColor, salary, description, t
         transform,
         transition,
         isDragging,
-    } = useSortable({ id });
+    } =useSortable({ id: `task-${id}` });
 
     const style = {
         transform: CSS.Transform.toString(transform),
