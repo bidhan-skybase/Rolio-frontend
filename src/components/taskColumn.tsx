@@ -33,10 +33,18 @@ export function Task({ id, title, company, logo, bgColor, salary, description, t
             <div className="flex items-start gap-2 mb-2">
                 {/* Company Logo */}
                 <div
-                    className="w-10 h-10 rounded-[4px] flex items-center justify-center flex-shrink-0 text-white font-semibold text-sm"
-                    style={{ backgroundColor: bgColor }}
+                    className="w-10 h-10 rounded-[4px] flex items-center justify-center flex-shrink-0 bg-gray-200 overflow-hidden"
+                    style={{ backgroundColor: 'red' }}
                 >
-                    {logo}
+                    {logo ? (
+                        <img
+                            src={logo}
+                            alt="logo"
+                            className="w-full h-full object-cover"
+                        />
+                    ) : (
+                        <span className="text-white font-semibold text-sm">N/A</span>
+                    )}
                 </div>
 
                 {/* Company Name & Menu */}
@@ -76,7 +84,7 @@ export function Task({ id, title, company, logo, bgColor, salary, description, t
                     {tags.map((tag, index) => (
                         <span
                             key={index}
-                            className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-xs rounded-sm font-medium"
+                            className="px-2 py-0.5 bg-gray-100 text-gray-800 text-xs rounded-sm font-medium"
                         >
                             {tag}
                         </span>
