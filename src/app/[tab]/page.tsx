@@ -15,8 +15,11 @@ export default function DashboardPage() {
     const params = useParams();
     const router = useRouter();
     const currentTab = params.tab as string;
-    const [dashboardData, setDashboardData] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [dashboardData, setDashboardData] = useState({
+        applied: 0,
+        offered: 0,
+        saved: 0
+    });    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
 
@@ -96,7 +99,7 @@ export default function DashboardPage() {
             </header>
 
             {/* Render content based on current tab */}
-            {currentTab === 'dashboard' && <Dashboard />}
+            {currentTab === 'dashboard' && <Dashboard stats={dashboardData} />}
             {currentTab === 'job-board' && <JobBoard />}
             {currentTab === 'resumes' && <Resumes />}
         </div>

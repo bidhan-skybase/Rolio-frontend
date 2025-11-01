@@ -1,17 +1,15 @@
 import React from 'react';
 import { MoveUpRight } from 'lucide-react';
 
-interface OTPStepProps {
-    email: string;
-    otp: string;
-    setOtp: (otp: string) => void;
-    onVerify: () => void;
-    onBack: () => void;
-    isLoading: boolean;
+interface DashboardProps {
+    stats: {
+        applied: number;
+        offered: number;
+        saved: number;
+    };
 }
 
-
-export default function Dashboard() {
+export default function Dashboard({stats}:DashboardProps) {
     return (
 
         <main className="min-h-screen">
@@ -28,7 +26,7 @@ export default function Dashboard() {
                         </div>
 
                         <div className="font-medium text-xl text-gray-300 mb-8">Total Saved Jobs</div>
-                        <div className="text-7xl font-bold text-white">24</div>
+                        <div className="text-7xl font-bold text-white">{stats.saved}</div>
                     </div>
 
                     {/* Card 2 - Total Jobs Applied */}
@@ -38,7 +36,7 @@ export default function Dashboard() {
                         </div>
 
                         <div className="font-medium text-xl text-white/90 mb-8">Total Jobs Applied</div>
-                        <div className="text-7xl font-bold text-white">12</div>
+                        <div className="text-7xl font-bold text-white">{stats.applied}</div>
                     </div>
 
                     {/* Card 3 - Total Jobs Offered */}
@@ -48,7 +46,7 @@ export default function Dashboard() {
                         </div>
 
                         <div className="font-medium text-xl text-white/90 mb-8">Total Jobs Offered</div>
-                        <div className="text-7xl font-bold text-white">7</div>
+                        <div className="text-7xl font-bold text-white">{stats.offered}</div>
                     </div>
                 </div>
 
