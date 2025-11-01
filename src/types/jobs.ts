@@ -1,5 +1,5 @@
 export interface JobInterface {
-    id: string;
+    id?: string;
     title: string;
     company: string;
     logo?: string;
@@ -7,5 +7,5 @@ export interface JobInterface {
     salary ?: string;
     description?: string;
     tags?: string[];
-    status: string
+    status?: string
 }

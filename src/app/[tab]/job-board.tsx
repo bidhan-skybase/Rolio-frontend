@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {
     closestCorners,
     DndContext,
@@ -12,7 +12,6 @@ import {arrayMove, sortableKeyboardCoordinates} from "@dnd-kit/sortable";
 import {Column} from "@/components/taskColumn";
 import {Bookmark, CheckCircle, Calendar, XCircle, Gift} from 'lucide-react';
 import {JobInterface} from "@/types/jobs";
-import {jobs} from "@/data";
 import {Button} from "@/components/ui/button";
 import {
     Dialog, DialogClose,
@@ -26,13 +25,23 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import { X } from "lucide-react"
+import axios from "axios";
 
 
 export default function JobBoard() {
-    const [tasks, setTasks] = useState<JobInterface[]>(jobs);
+    const [jobs, setJobs] = useState<JobInterface[]>([]);
     const [activeId, setActiveId] = useState(null);
-    const [tags, setTags] = useState<string[]>([])
     const [inputValue, setInputValue] = useState("")
+
+    const [title,setTitle] = useState("")
+    const [companyName, setCompanyName] = useState("")
+    const [logo, setLogo] = useState("")
+    const [salary, setSalary] = useState("")
+    const [tags, setTags] = useState<string[]>([])
+    const [description, setDescription] = useState<string>("")
+
+    const [open, setOpen] = useState(false)
+
 
 
     const sensors = useSensors(
@@ -41,6 +50,42 @@ export default function JobBoard() {
             coordinateGetter: sortableKeyboardCoordinates,
         })
     );
+
+    useEffect(() => {
+        const getJobLists=async ()=>{
+            try{
+                const res=await axios.get('/api/jobs/list');
+                console.log("Job list:",res.data);
+                setJobs(res.data);
+            }catch (err:any){
+                console.error('Error fetching jobs list');
+            }finally {
+                {
+                    // setLoading(false);
+                }
+            }
+        }
+        getJobLists();
+    }, []);
+
+    async function createJob() {
+        try{
+            const newJob: JobInterface = {
+                title: title.trim(),
+                company: companyName.trim(),
+                logo: logo || undefined,
+                salary: salary || undefined,
+                description: description || undefined,
+                tags: tags.length > 0 ? tags : undefined,
+            };
+            const res=await axios.post('/api/jobs/create',newJob)
+            setOpen(false)
+            console.log(res)
+
+        }catch (err){
+            console.log(err)
+        }
+    }
 
 
     const columns = {
@@ -52,7 +97,7 @@ export default function JobBoard() {
     };
 
     const getTasksByStatus = (status: string) => {
-        return tasks.filter((task) => task.status === status);
+        return jobs.filter((task) => task.status === status);
     };
 
     const handleDragStart = (event) => {
@@ -69,14 +114,14 @@ export default function JobBoard() {
 
         if (activeId === overId) return;
 
-        const activeTask = tasks.find((t) => t.id === activeId);
-        const overTask = tasks.find((t) => t.id === overId);
+        const activeTask = jobs.find((t) => t.id === activeId);
+        const overTask = jobs.find((t) => t.id === overId);
 
         if (!activeTask) return;
         const overColumn = Object.keys(columns).find((key) => key === overId);
 
         if (overColumn) {
-            setTasks((tasks) => {
+            setJobs((tasks) => {
                 return tasks.map((task) => {
                     if (task.id === activeId) {
                         return {...task, status: overColumn};
@@ -85,11 +130,11 @@ export default function JobBoard() {
                 });
             });
         } else if (overTask) {
-            const activeIndex = tasks.findIndex((t) => t.id === activeId);
-            const overIndex = tasks.findIndex((t) => t.id === overId);
+            const activeIndex = jobs.findIndex((t) => t.id === activeId);
+            const overIndex = jobs.findIndex((t) => t.id === overId);
 
             if (activeTask.status !== overTask.status) {
-                setTasks((tasks) => {
+                setJobs((tasks) => {
                     return tasks.map((task) => {
                         if (task.id === activeId) {
                             return {...task, status: overTask.status};
@@ -98,7 +143,7 @@ export default function JobBoard() {
                     });
                 });
             } else {
-                setTasks((tasks) => {
+                setJobs((tasks) => {
                     return arrayMove(tasks, activeIndex, overIndex);
                 });
             }
@@ -135,7 +180,7 @@ export default function JobBoard() {
                 </div>
 
 
-                <Dialog>
+                <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
                         <Button className="rounded-[4px] bg-black text-white text-[14px] hover:bg-black/80">
                             Add Job
@@ -149,22 +194,22 @@ export default function JobBoard() {
                     </DialogHeader>
                     <div>
                         <Label className='mb-2 text-xs font-medium text-muted-foreground'>Job title *</Label>
-                        <Input placeholder='Title'></Input>
+                        <Input placeholder='Title' onChange={(e)=>setTitle(e.target.value)}></Input>
                     </div>
                     <div className='flex-row flex gap-2'>
                         <div className='flex-2'>
                             <Label className='mb-2 text-xs font-medium text-muted-foreground'>Company name *</Label>
-                            <Input placeholder='Name'></Input>
+                            <Input placeholder='Name' onChange={(e)=>setCompanyName(e.target.value)}></Input>
                         </div>
                         <div className='flex-2'>
                             <Label className='mb-2 text-xs font-medium text-muted-foreground'>Logo Url</Label>
-                            <Input placeholder='Url'></Input>
+                            <Input placeholder='Url' onChange={(e)=>setLogo(e.target.value)}></Input>
                         </div>
                     </div>
                     <div className='flex-row flex gap-2'>
                         <div className='flex-2'>
                             <Label className='mb-2 text-xs font-medium text-muted-foreground'>Expected salary</Label>
-                            <Input placeholder='Salary'></Input>
+                            <Input placeholder='Salary' onChange={(e)=>setSalary(e.target.value)}></Input>
                         </div>
                         <div className="flex flex-col flex-2">
                             <Label className="mb-2 text-xs font-medium text-muted-foreground">
@@ -200,13 +245,15 @@ export default function JobBoard() {
                     </div>
                     <div>
                         <Label className='mb-2 text-xs font-medium text-muted-foreground'>Description</Label>
-                        <Textarea placeholder="Type your description here." />
+                        <Textarea placeholder="Type your description here." onChange={(e)=>setDescription(e.target.value)}/>
                     </div>
                     <DialogFooter>
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
-                        <Button type="submit">Add Job</Button>
+                        <Button type="submit" onClick={()=>{
+                           createJob()
+                        }}>Add Job</Button>
                     </DialogFooter>
                 </DialogContent>
                 </Dialog>

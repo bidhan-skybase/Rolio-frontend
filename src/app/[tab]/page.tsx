@@ -21,6 +21,7 @@ export default function DashboardPage() {
         saved: 0
     });    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const[jobs,setJobs]=useState([]);
 
 
     useEffect(() => {
@@ -46,6 +47,26 @@ export default function DashboardPage() {
         };
 
         fetchDashboard();
+    }, []);
+
+    useEffect(() => {
+        const getJobLists=async ()=>{
+            try{
+                setLoading(true);
+                const res=await axios.get('/api/jobs/list');
+                console.log("Job list:",res.data);
+                setJobs(res.data);
+                setError(null)
+            }catch (err:any){
+                console.error('Error fetching jobs list');
+                setError(err.message || 'Failed to fetch job data');
+            }finally {
+                {
+                    setLoading(false);
+                }
+            }
+        }
+        getJobLists();
     }, []);
 
     const getTabLabel = (slug: string) => {
