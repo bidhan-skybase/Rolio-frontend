@@ -139,7 +139,7 @@ export const Column = memo(({ id, title, tasks, icon: Icon, onDeleteJob }: Colum
     return (
         <div
             ref={setNodeRef}
-            className="rounded-[4px] p-3 flex-1 min-w-[280px] border border-gray-200"
+            className="rounded-[4px] p-2 flex-1 min-w-[280px] border border-gray-200"
             style={{backgroundColor:"#F2F2F2"}}
         >
             <div className="flex items-center justify-between mb-3">

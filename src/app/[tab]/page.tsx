@@ -8,6 +8,8 @@ import Dashboard from "@/app/[tab]/dashboard";
 import JobBoard from "@/app/[tab]/job-board";
 import Resumes from "@/app/[tab]/resumes";
 import axios from "axios";
+import UserAvatar from "@/components/userAvatar";
+
 
 const tabs = ['dashboard', 'job-board', 'resumes'];
 
@@ -26,7 +28,7 @@ export default function DashboardPage() {
 
     useEffect(() => {
         if (!currentTab || !tabs.includes(currentTab)) {
-            router.replace('/dashboard');
+            router.replace('/job-board');
         }
     }, [currentTab, router]);
 
@@ -69,14 +71,14 @@ export default function DashboardPage() {
         getJobLists();
     }, []);
 
-    const getTabLabel = (slug: string) => {
-        const labels = {
-            'dashboard': 'Dashboard',
-            'job-board': 'Job Board',
-            'resumes': 'Resumes'
-        };
-        return labels[slug as keyof typeof labels] || slug;
-    };
+    // const getTabLabel = (slug: string) => {
+    //     const labels = {
+    //         'dashboard': 'Dashboard',
+    //         'job-board': 'Job Board',
+    //         'resumes': 'Resumes'
+    //     };
+    //     return labels[slug as keyof typeof labels] || slug;
+    // };
 
     return (
         <div className='h-screen w-full bg-gray-50 flex flex-col'>
@@ -91,31 +93,24 @@ export default function DashboardPage() {
                             style={{borderRadius: 12}}
                         />
                         <h1 className="font-semibold text-2xl pl-2">Rolio</h1>
-                        <div className="inline-flex bg-gray-200 rounded-lg p-1 ml-12">
-                            {tabs.map((tab) => (
-                                <Link
-                                    key={tab}
-                                    href={`/${tab}`}
-                                    className={`px-6 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                                        currentTab === tab
-                                            ? 'bg-white text-gray-900 shadow-sm'
-                                            : 'text-gray-600 hover:text-gray-900'
-                                    }`}
-                                >
-                                    {getTabLabel(tab)}
-                                </Link>
-                            ))}
-                        </div>
+                        {/*<div className="inline-flex bg-gray-200 rounded-lg p-1 ml-12">*/}
+                        {/*    {tabs.map((tab) => (*/}
+                        {/*        <Link*/}
+                        {/*            key={tab}*/}
+                        {/*            href={`/${tab}`}*/}
+                        {/*            className={`px-6 py-2 rounded-md text-sm font-medium transition-all duration-200 ${*/}
+                        {/*                currentTab === tab*/}
+                        {/*                    ? 'bg-white text-gray-900 shadow-sm'*/}
+                        {/*                    : 'text-gray-600 hover:text-gray-900'*/}
+                        {/*            }`}*/}
+                        {/*        >*/}
+                        {/*            {getTabLabel(tab)}*/}
+                        {/*        </Link>*/}
+                        {/*    ))}*/}
+                        {/*</div>*/}
                     </div>
 
-                    <div className="w-10 h-10 rounded-full overflow-hidden">
-                        <Image
-                            src="/user.png"
-                            alt="user avatar"
-                            width={40}
-                            height={40}
-                        />
-                    </div>
+                   <UserAvatar></UserAvatar>
                 </div>
             </header>
 

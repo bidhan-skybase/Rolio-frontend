@@ -109,7 +109,7 @@ const OTPStep: React.FC<OTPStepProps> = ({email, otp, setOtp, onVerify, onBack, 
             {/*name="email"*/}
             {/*value={email}*/}
             {/*onChange={(e) => setEmail(e.target.value)*/}
-            <TextField placeholder={"Six digit code"} name={"OTP"} type={"number"} value={otp}
+            <TextField placeholder={"Six digit code"} name={"OTP"} value={otp}
                        onChange={(e) => setOtp(e.target.value)}></TextField>
 
             <button
@@ -158,7 +158,8 @@ export default function LoginPage() {
             });
             console.log("verify otp:", res.data);
             document.cookie = `access_token=${res.data.access_token}; path=/; secure; samesite=strict`;
-            router.push("/dashboard");
+            document.cookie=`email=${res.data.user.email}; path=/; secure; samesite=strict`;
+            router.push("/job-board");
         } catch (error) {
             console.error(error);
         } finally {
