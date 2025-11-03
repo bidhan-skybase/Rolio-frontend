@@ -23,6 +23,9 @@ export async function POST(req: Request, res: Response) {
             }
             }
         )
+
+        console.log("response")
+        console.log(res.data);
         return NextResponse.json(res.data);
 
     }catch (err){

@@ -1,13 +1,18 @@
 // components/taskColumn.tsx
 import {SortableContext, useSortable, verticalListSortingStrategy} from "@dnd-kit/sortable";
-import { CSS } from '@dnd-kit/utilities';
+import {CSS} from '@dnd-kit/utilities';
 import {useDroppable} from "@dnd-kit/core";
-import { X } from 'lucide-react';
+import {X} from 'lucide-react';
 import {JobInterface} from "@/types/jobs";
 import {ColumnInterface} from "@/types/columnInterface";
 import axios from "axios";
+import {memo} from "react";
 
-export function Task({ id, title, company, logo, bgColor, salary, description, tags }: JobInterface) {
+interface TaskProps extends JobInterface {
+    onDelete: (jobId: number) => void;
+}
+
+const Task = memo(({ id, title, company, logo, salary, description, tags, onDelete }: TaskProps) => {
     const {
         attributes,
         listeners,
@@ -15,7 +20,7 @@ export function Task({ id, title, company, logo, bgColor, salary, description, t
         transform,
         transition,
         isDragging,
-    } =useSortable({ id: `task-${id}` });
+    } = useSortable({ id: `task-${id}` });
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -23,17 +28,23 @@ export function Task({ id, title, company, logo, bgColor, salary, description, t
         opacity: isDragging ? 0.5 : 1,
     };
 
-    async function deleteJob(jobId: string) {
-        console.log(jobId);
+    const handleDelete = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        if (!confirm('Are you sure you want to delete this job?')) {
+            return;
+        }
+
         try {
             await axios.delete('/api/jobs/delete', {
-                data: { id: jobId }
+                data: { id: String(id) }
             });
-            // TODO: Update UI after deletion
-        } catch (err: any) {
+            onDelete(id);
+        } catch (err) {
             console.error('Failed to delete job:', err);
+            alert('Failed to delete job. Please try again.');
         }
-    }
+    };
 
     return (
         <div
@@ -42,40 +53,37 @@ export function Task({ id, title, company, logo, bgColor, salary, description, t
             className="bg-white p-3 rounded-[4px] mb-2 hover:shadow-sm transition-shadow border border-gray-100"
         >
             <div className="flex items-start gap-2 mb-2">
-                {/* Drag Handle - Only this area triggers dragging */}
+                {/* Drag Handle */}
                 <div
                     {...attributes}
                     {...listeners}
                     className="cursor-grab active:cursor-grabbing"
                 >
-                    <div
-                        className="w-10 h-10 rounded-[4px] flex items-center justify-center flex-shrink-0 bg-gray-200 overflow-hidden"
-                        style={{ backgroundColor: 'red' }}
-                    >
+                    <div className="w-10 h-10 rounded-[4px] flex items-center justify-center flex-shrink-0 bg-gray-200 overflow-hidden">
                         {logo ? (
                             <img
                                 src={logo}
-                                alt="logo"
+                                alt={`${company} logo`}
                                 className="w-full h-full object-cover"
                             />
                         ) : (
-                            <span className="text-white font-semibold text-sm">N/A</span>
+                            <span className="text-white font-semibold text-sm">
+                                {company.charAt(0).toUpperCase()}
+                            </span>
                         )}
                     </div>
                 </div>
 
-                {/* Company Name & Menu */}
+                {/* Company Name & Delete Button */}
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold text-gray-500">{company}</span>
+                        <span className="text-xs font-semibold text-gray-500 truncate">
+                            {company}
+                        </span>
                         <button
-                            className="text-gray-400 hover:text-gray-600 transition-colors"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                if (confirm('Are you sure you want to delete this job?')) {
-                                    deleteJob(id);
-                                }
-                            }}
+                            className="text-gray-400 hover:text-red-600 transition-colors"
+                            onClick={handleDelete}
+                            aria-label="Delete job"
                         >
                             <X size={14} />
                         </button>
@@ -83,21 +91,24 @@ export function Task({ id, title, company, logo, bgColor, salary, description, t
                 </div>
             </div>
 
-            {/* Rest of the content remains the same */}
-            <h3 className="font-bold text-gray-900 text-sm mb-1">
+            {/* Job Title */}
+            <h3 className="font-bold text-gray-900 text-sm mb-1 line-clamp-2">
                 {title}
             </h3>
 
+            {/* Salary */}
             {salary && (
                 <p className="text-xs text-gray-600 mb-2">{salary}</p>
             )}
 
+            {/* Description */}
             {description && (
                 <p className="text-xs text-gray-500 mb-2 line-clamp-2">{description}</p>
             )}
 
+            {/* Tags */}
             {tags && tags.length > 0 && (
-                <div className="flex gap-1 mb-2 flex-wrap">
+                <div className="flex gap-1 flex-wrap">
                     {tags.map((tag, index) => (
                         <span
                             key={index}
@@ -110,46 +121,48 @@ export function Task({ id, title, company, logo, bgColor, salary, description, t
             )}
         </div>
     );
+});
+
+Task.displayName = 'Task';
+
+interface ColumnProps extends ColumnInterface {
+    onDeleteJob: (jobId: number) => void;
 }
-export function Column({ id, title, tasks, icon: Icon }:ColumnInterface) {
+
+export const Column = memo(({ id, title, tasks, icon: Icon, onDeleteJob }: ColumnProps) => {
     const { setNodeRef, isOver } = useDroppable({
         id: id,
     });
 
-    const taskIds = tasks.map((task) => task.id);
+    const taskIds = tasks.map((task) => `task-${task.id}`);
 
     return (
-        <div className="rounded-[4px] p-3 flex-1 min-w-0 border border-gray-200" style={{backgroundColor:"#F2F2F2"}}>
+        <div
+            ref={setNodeRef}
+            className="rounded-[4px] p-3 flex-1 min-w-[280px] border border-gray-200"
+            style={{backgroundColor:"#F2F2F2"}}
+        >
             <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                     {Icon && <Icon size={16} className="text-gray-600" />}
                     <h2 className="font-semibold text-xs text-gray-700">
-                        {title} <span className="text-gray-500">{tasks.length}</span>
+                        {title} <span className="text-gray-500">({tasks.length})</span>
                     </h2>
                 </div>
-
             </div>
 
             <div
-                ref={setNodeRef}
                 className={`min-h-[400px] rounded-[4px] transition-colors ${
-                    isOver ? 'bg-blue-50 border-2 border-blue-300 border-dashed p-2' : ''
+                    isOver ? 'bg-blue-50 border-2 border-blue-300 border-dashed p-2' : 'p-2'
                 }`}
             >
                 <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
-                    <div className='mt-6'>
+                    <div>
                         {tasks.map((task) => (
                             <Task
-                                status={task.status}
                                 key={task.id}
-                                id={task.id}
-                                title={task.title}
-                                company={task.company}
-                                logo={task.logo}
-                                bgColor={task.bgColor}
-                                salary={task.salary}
-                                description={task.description}
-                                tags={task.tags}
+                                {...task}
+                                onDelete={onDeleteJob}
                             />
                         ))}
                         {tasks.length === 0 && (
@@ -162,4 +175,8 @@ export function Column({ id, title, tasks, icon: Icon }:ColumnInterface) {
             </div>
         </div>
     );
-}
+});
+
+Column.displayName = 'Column';
+
+export { Task };
