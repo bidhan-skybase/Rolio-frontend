@@ -1,6 +1,7 @@
 import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
 import axios from "axios";
+import {API_BASE_URL} from "@/types/constants";
 
 export async  function  GET(){
     const cookieStore = await cookies();
@@ -15,7 +16,7 @@ export async  function  GET(){
     };
 
     try {
-        const res = await axios.get('http://127.0.0.1:8000/api/v1/list', config);
+        const res = await axios.get(`${API_BASE_URL}/list`, config);
         return NextResponse.json(res.data);
     } catch (err) {
         console.log(err);

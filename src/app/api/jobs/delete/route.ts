@@ -1,6 +1,7 @@
 import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
 import axios from "axios";
+import {API_BASE_URL} from "@/types/constants";
 
 export async function DELETE(req: Request) {
     const cookieStore = await cookies();
@@ -18,7 +19,7 @@ export async function DELETE(req: Request) {
 
     try {
         const res = await axios.delete(
-            `http://127.0.0.1:8000/api/v1/delete/${id}`,
+            `${API_BASE_URL}/delete/${id}`,
             config
         );
         return NextResponse.json({ success: true }, { status: 200 });

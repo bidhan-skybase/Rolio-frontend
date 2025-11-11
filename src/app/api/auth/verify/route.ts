@@ -1,11 +1,12 @@
 import {NextResponse} from "next/server";
 import axios from "axios";
+import {API_BASE_URL} from "@/types/constants";
 
 export async function POST(req:Request){
     const{email,otp}=await req.json();
 
     try{
-        const res = await axios.post('http://127.0.0.1:8000/api/v1/verify_otp', {
+        const res = await axios.post(`${API_BASE_URL}/verify_otp`, {
             email,
             otp
         });

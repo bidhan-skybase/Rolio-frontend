@@ -2,6 +2,7 @@ import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
 import axios from "axios";
 import {JobInterface} from "@/types/jobs";
+import {API_BASE_URL} from "@/types/constants";
 
 
 export async function POST(req: Request, res: Response) {
@@ -15,7 +16,7 @@ export async function POST(req: Request, res: Response) {
 
     try{
 
-        const res= await axios.post<JobInterface[]>("http://127.0.0.1:8000/api/v1/create",
+        const res= await axios.post<JobInterface[]>(`${API_BASE_URL}/create`,
             jobModel,{
             headers:{
                 Authorization: `Bearer ${token}`,

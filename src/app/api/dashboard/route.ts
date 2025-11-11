@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 import { cookies } from "next/headers";
+import {API_BASE_URL} from "@/types/constants";
 
 export async function GET(request: NextRequest) {
     const cookieStore = await cookies();
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
     };
 
     try {
-        const res = await axios.get('http://127.0.0.1:8000/api/v1/stats',config);
+        const res = await axios.get(`${API_BASE_URL}/stats`,config);
         return NextResponse.json(res.data);
     } catch (err: any) {
         console.error('Dashboard fetch failed:', err.response?.data || err.message);

@@ -367,7 +367,7 @@ export default function JobBoard() {
                     onDragOver={handleDragOver}
                     onDragEnd={handleDragEnd}
                 >
-                    <div className="flex gap-3 overflow-x-auto pb-4">
+                    <div className="flex gap-3 pb-4 overflow-hidden">
                         {Object.values(COLUMNS).map((column) => (
                             <Column
                                 key={column.id}

@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
+import * as Constants from "node:constants";
+import {API_BASE_URL} from "@/types/constants";
 
 export async function POST(req: Request) {
  const{email}=await req.json();
 
  try{
-     const res = await axios.post('http://127.0.0.1:8000/api/v1/request_otp', {
+     const res = await axios.post(`${API_BASE_URL}/request_otp`, {
          email,
      });
 

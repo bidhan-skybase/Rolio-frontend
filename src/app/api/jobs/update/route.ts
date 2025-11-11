@@ -1,6 +1,7 @@
 import axios from "axios";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import {API_BASE_URL} from "@/types/constants";
 
 export async function PATCH(req: Request) {
     const cookieStore = await cookies();
@@ -18,7 +19,7 @@ export async function PATCH(req: Request) {
 
     try {
         const res = await axios.patch(
-            `http://127.0.0.1:8000/api/v1/${job_id}/status`,
+            `${API_BASE_URL}/${job_id}/status`,
             null,
             {
                 ...config,
