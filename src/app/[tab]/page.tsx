@@ -37,11 +37,14 @@ export default function DashboardPage() {
             try {
                 setLoading(true);
                 const res = await axios.get('/api/dashboard');
-                console.log("Dashboard data:", res.data);
                 setDashboardData(res.data);
                 setError(null);
-            } catch (err:any) {
+            } catch (err: any) {
                 console.error("Error fetching dashboard:", err);
+                if (err.response?.status === 403 || err.response?.status === 401) {
+                    router.replace('/auth');
+                    return;
+                }
                 setError(err.message || 'Failed to fetch dashboard data');
             } finally {
                 setLoading(false);
@@ -50,6 +53,7 @@ export default function DashboardPage() {
 
         fetchDashboard();
     }, []);
+
 
     useEffect(() => {
         const getJobLists=async ()=>{
@@ -86,7 +90,7 @@ export default function DashboardPage() {
                 <div className='flex flex-row justify-between items-center'>
                     <div className="flex flex-row items-center">
                         <Image
-                            src="/evil-rabbit.png"
+                            src="/rolio.png"
                             alt="main logo"
                             width={40}
                             height={40}
