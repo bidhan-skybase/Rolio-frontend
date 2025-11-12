@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import axios from "axios";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";

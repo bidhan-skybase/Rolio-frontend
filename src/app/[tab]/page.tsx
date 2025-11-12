@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // app/[tab]/page.tsx
 'use client';
 import Image from "next/image";

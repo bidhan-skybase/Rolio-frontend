@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import {useEffect, useState, useCallback} from "react";
 import {
     closestCorners,
@@ -112,7 +114,7 @@ export default function JobBoard() {
         }
     };
 
-    const deleteJob = useCallback((jobId: number) => {
+    const deleteJob = useCallback((jobId: string) => {
         setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
     }, []);
 
@@ -193,7 +195,7 @@ export default function JobBoard() {
         console.log("Job ID:", jobId);
 
         // Find the current job with the updated status from handleDragOver
-        const currentJob = jobs.find((job) => job.id === jobId);
+        const currentJob = jobs.find((job) => job.id === String(jobId));
         if (!currentJob) {
             console.log("Current job not found");
             return;
@@ -210,7 +212,7 @@ export default function JobBoard() {
         } else {
             // Dropped on a task - the status was already updated by handleDragOver
             // Use the current job's status which was set during drag over
-            finalStatus = currentJob.status;
+            finalStatus = currentJob.status??"applied";
             console.log("Using current status from dragOver:", finalStatus);
         }
 

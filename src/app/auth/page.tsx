@@ -1,4 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+
 'use client';
+
 import {useState} from "react";
 import TextField from "@/components/textfield";
 import SocialButton from "@/components/socialMediaButton";
