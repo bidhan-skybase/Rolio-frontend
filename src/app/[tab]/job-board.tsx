@@ -79,6 +79,8 @@ export default function JobBoard() {
     const [inputValue, setInputValue] = useState("");
     const [formData, setFormData] = useState<FormData>(initialFormData);
     const [open, setOpen] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [jobToDelete, setJobToDelete] = useState<string | null>(null);
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -134,9 +136,31 @@ export default function JobBoard() {
         }
     };
 
-    const deleteJob = useCallback((jobId: string) => {
-        setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
+    const promptDeleteJob = useCallback((jobId: string) => {
+        console.log(jobId);
+        setJobToDelete(jobId);
+        setShowDeleteDialog(true);
     }, []);
+
+    const handleConfirmDelete = async () => {
+        if (!jobToDelete) return;
+
+        const originalJobs = [...jobs];
+        setJobs(prevJobs => prevJobs.filter(job => String(job.id) !== jobToDelete));
+        setShowDeleteDialog(false);
+
+        try {
+            await axios.delete("/api/jobs/delete", {
+                data: { id: jobToDelete },
+            });
+        } catch (error) {
+            console.error("Failed to delete job:", error);
+            alert("Failed to delete job. Please try again.");
+            setJobs(originalJobs);
+        } finally {
+            setJobToDelete(null);
+        }
+    };
 
     const getTasksByStatus = useCallback((status: string) => {
         return jobs.filter((task) => task.status === status);
@@ -382,7 +406,7 @@ export default function JobBoard() {
                                 title={column.title}
                                 icon={column.icon}
                                 tasks={getTasksByStatus(column.id)}
-                                onDeleteJob={deleteJob}
+                                onDeleteJob={promptDeleteJob}
                             />
                         ))}
                     </div>
@@ -391,6 +415,21 @@ export default function JobBoard() {
                     </DragOverlay>
                 </DndContext>
             </main>
+            <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Are you absolutely sure?</DialogTitle>
+                        <DialogDescription>
+                            This action cannot be undone. This will permanently delete this job
+                            from our servers.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
+                        <Button variant="destructive" onClick={handleConfirmDelete}>Delete</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

@@ -9,7 +9,7 @@ import axios from "axios";
 import { memo } from "react";
 
 interface TaskProps extends JobInterface {
-    onDelete: (jobId: string) => void; // ensure this matches Column's onDeleteJob
+    onDelete: (jobId: string) => void;
 }
 
 const Task = memo(({ id, title, company, logo, salary, description, tags, onDelete }: TaskProps) => {
@@ -21,20 +21,9 @@ const Task = memo(({ id, title, company, logo, salary, description, tags, onDele
         opacity: isDragging ? 0.5 : 1,
     };
 
-    const handleDelete = async (e: React.MouseEvent) => {
+    const handleDelete = (e: React.MouseEvent) => {
         e.stopPropagation();
-
-        if (!confirm('Are you sure you want to delete this job?')) return;
-
-        try {
-            await axios.delete('/api/jobs/delete', {
-                data: { id: String(id) } // always send as string
-            });
-            onDelete(String(id)); // call callback with string
-        } catch (err) {
-            console.error('Failed to delete job:', err);
-            alert('Failed to delete job. Please try again.');
-        }
+        onDelete(String(id));
     };
 
     return (
