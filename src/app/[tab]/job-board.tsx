@@ -57,6 +57,22 @@ const initialFormData: FormData = {
     description: ""
 };
 
+const TaskCard = ({ job }: { job: JobInterface }) => {
+    return (
+        <div
+            style={{
+                transform: "rotate(3deg) scale(1.05)",
+                boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.2)",
+            }}
+            className="p-3 bg-white rounded-lg cursor-grabbing"
+        >
+            <p className="font-bold text-sm">{job.title}</p>
+            <p className="text-xs text-gray-500">{job.company}</p>
+        </div>
+    );
+};
+
+
 export default function JobBoard() {
     const [jobs, setJobs] = useState<JobInterface[]>([]);
     const [activeId, setActiveId] = useState<string | null>(null);
@@ -70,6 +86,10 @@ export default function JobBoard() {
             coordinateGetter: sortableKeyboardCoordinates,
         })
     );
+
+    const activeJob = activeId
+        ? jobs.find((job) => String(job.id) === String(activeId).replace("task-", ""))
+        : null;
 
     useEffect(() => {
         const getJobLists = async () => {
@@ -127,7 +147,7 @@ export default function JobBoard() {
     };
 
     const handleDragOver = (event: any) => {
-        const {active, over} = event;
+        const { active, over } = event;
         if (!over) return;
 
         const activeId = active.id;
@@ -135,101 +155,86 @@ export default function JobBoard() {
 
         if (activeId === overId) return;
 
-        // Extract the numeric ID from task-X format
-        const activeTaskId = activeId.replace("task-", "");
+        const activeTaskId = String(activeId).replace("task-", "");
+        const overTaskId = String(overId).replace("task-", "");
+
         const activeTask = jobs.find((t) => String(t.id) === activeTaskId);
+        const overTask = jobs.find((t) => String(t.id) === overTaskId);
 
-        if (!activeTask) return;
+        if (!activeTask || !overTask || activeTask.status !== overTask.status) {
+            return;
+        }
 
-        // Check if dropped on a column
-        const overColumn = Object.keys(COLUMNS).find((key) => key === overId);
+        const activeIndex = jobs.findIndex((t) => String(t.id) === activeTaskId);
+        const overIndex = jobs.findIndex((t) => String(t.id) === overTaskId);
 
-        if (overColumn) {
-            // Dropped on a column - update status
-            setJobs((tasks) =>
-                tasks.map((task) =>
-                    String(task.id) === activeTaskId
-                        ? {...task, status: overColumn}
-                        : task
-                )
-            );
-        } else {
-            // Dropped on another task
-            const overTaskId = overId.replace("task-", "");
-            const overTask = jobs.find((t) => String(t.id) === overTaskId);
-            if (!overTask) return;
-
-            const activeIndex = jobs.findIndex((t) => String(t.id) === activeTaskId);
-            const overIndex = jobs.findIndex((t) => String(t.id) === overTaskId);
-
-            if (activeTask.status !== overTask.status) {
-                // Moving to different column
-                setJobs((tasks) =>
-                    tasks.map((task) =>
-                        String(task.id) === activeTaskId
-                            ? {...task, status: overTask.status}
-                            : task
-                    )
-                );
-            } else {
-                // Reordering within same column
-                setJobs((tasks) => arrayMove(tasks, activeIndex, overIndex));
-            }
+        if (activeIndex !== overIndex) {
+            setJobs((tasks) => arrayMove(tasks, activeIndex, overIndex));
         }
     };
 
     const handleDragEnd = async (event: any) => {
-        const {active, over} = event;
+        const { active, over } = event;
         setActiveId(null);
 
         if (!over) {
-            console.log("No drop target");
             return;
         }
 
-        // Extract job ID from the task ID
-        const taskId = active.id.replace("task-", "");
-        const jobId = Number(taskId);
+        const activeId = active.id;
+        const overId = over.id;
 
-        console.log("Drag ended - Active ID:", active.id, "Over ID:", over.id);
-        console.log("Job ID:", jobId);
-
-        // Find the current job with the updated status from handleDragOver
-        const currentJob = jobs.find((job) => job.id === String(jobId));
-        if (!currentJob) {
-            console.log("Current job not found");
+        if (activeId === overId) {
             return;
         }
 
-        // The status might have already been updated by handleDragOver
-        // We need to get the final status from where it was dropped
-        let finalStatus: string;
+        const taskId = String(activeId).replace("task-", "");
+        const job = jobs.find((j) => String(j.id) === taskId);
 
-        // Check if dropped directly on a column
-        if (Object.keys(COLUMNS).includes(over.id)) {
-            finalStatus = over.id;
-            console.log("Dropped on column:", finalStatus);
+        if (!job) {
+            return;
+        }
+
+        const oldStatus = job.status;
+        let newStatus: string | undefined = oldStatus;
+
+        const overIsColumn = Object.keys(COLUMNS).includes(overId);
+        if (overIsColumn) {
+            newStatus = overId;
         } else {
-            // Dropped on a task - the status was already updated by handleDragOver
-            // Use the current job's status which was set during drag over
-            finalStatus = currentJob.status??"applied";
-            console.log("Using current status from dragOver:", finalStatus);
+            const overTaskId = String(overId).replace("task-", "");
+            const overTask = jobs.find((j) => String(j.id) === overTaskId);
+            if (overTask) {
+                newStatus = overTask.status;
+            }
         }
 
-        console.log("Final status:", finalStatus, "Job will be saved to backend");
+        if (!newStatus || oldStatus === newStatus) {
+            // If status hasn't changed, we might still need to handle reordering persistence if necessary.
+            // For now, we only care about status changes.
+            return;
+        }
 
-        // Always make the API call to persist the change
-        // (Don't check if status changed, as handleDragOver already updated it)
+        // Optimistically update the UI
+        setJobs((prevJobs) =>
+            prevJobs.map((j) =>
+                String(j.id) === taskId ? { ...j, status: newStatus } : j
+            )
+        );
+
         try {
-            console.log("Calling API with:", { job_id: jobId, status_value: finalStatus });
-            const response = await axios.patch("/api/jobs/update", {
-                job_id: jobId,
-                status_value: finalStatus,
+            await axios.patch("/api/jobs/update", {
+                job_id: Number(taskId),
+                status_value: newStatus,
             });
-            console.log("API response:", response.data);
         } catch (error: any) {
+            // Revert on failure
+            setJobs((prevJobs) =>
+                prevJobs.map((j) =>
+                    String(j.id) === taskId ? { ...j, status: oldStatus } : j
+                )
+            );
             console.error("Status update failed:", error);
-            console.error("Error details:", error.response?.data);
             alert("Failed to update job status. Please try again.");
         }
     };
@@ -381,6 +386,9 @@ export default function JobBoard() {
                             />
                         ))}
                     </div>
+                    <DragOverlay>
+                        {activeJob ? <TaskCard job={activeJob} /> : null}
+                    </DragOverlay>
                 </DndContext>
             </main>
         </>
